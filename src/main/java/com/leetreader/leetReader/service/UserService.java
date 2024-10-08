@@ -5,7 +5,7 @@ import com.leetreader.leetReader.dto.UserPasswordDTO;
 import com.leetreader.leetReader.mapper.UserDTOMapper;
 import com.leetreader.leetReader.model.User;
 import com.leetreader.leetReader.repository.UserRepository;
-import com.leetreader.leetReader.security.SecurityUser;
+import com.leetreader.leetReader.config.security.SecurityUser;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -25,6 +25,7 @@ public class UserService implements UserDetailsService {
     private final UserRepository userRepository;
     private final UserDTOMapper userDTOMapper;
 
+//    it use for spring security authentication
     @Override
     public UserDetails loadUserByUsername(String username) {
         var user = userRepository.findUserByUsername(username);

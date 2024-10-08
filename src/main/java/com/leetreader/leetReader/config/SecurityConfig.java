@@ -1,16 +1,27 @@
-package com.leetreader.leetReader.configuration;
+package com.leetreader.leetReader.config;
 
+import com.leetreader.leetReader.config.security.filters.CustomAuthenticationFilter;
+import com.leetreader.leetReader.config.security.managers.CustomAuthenticationManager;
+import com.leetreader.leetReader.config.security.providers.CustomAuthenticationProvider;
+import com.leetreader.leetReader.service.UserService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.access.intercept.AuthorizationFilter;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
+@RequiredArgsConstructor
 //@EnableWebSecurity
 public class SecurityConfig {
+    //    private final CustomAuthenticationManager customAuthenticationManager;
+    private final UserService userService;
 //    laur play list for spring security in 2022
 /*
     he is starting to tell us why we need to spring security it use for authentication & authorization
@@ -50,7 +61,7 @@ public class SecurityConfig {
     }
 
     @Bean
-    SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    SecurityFilterChain securityFilterChain(HttpSecurity http, CustomAuthenticationManager customAuthenticationManager) throws Exception {
         return http
                 .authorizeHttpRequests(
                         authorizeHttp -> {
@@ -61,7 +72,16 @@ public class SecurityConfig {
 //                The second parameter 'true' to enforce redirect user to specific url
                 .formLogin(l -> l.defaultSuccessUrl("https://www.google.com"))
                 .logout(l -> l.logoutSuccessUrl("https://www.youtube.com"))
-                .httpBasic(Customizer.withDefaults())
+                .httpBasic(Customizer.withDefaults()) // we need it when implement normal username and password authentication method
+                .addFilterAfter(new CustomAuthenticationFilter(customAuthenticationManager), AuthorizationFilter.class)
                 .build();
+    }
+
+    @Bean
+    public DaoAuthenticationProvider daoAuthenticationProvider() {
+        DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
+        provider.setPasswordEncoder(passwordEncoder());
+        provider.setUserDetailsService(userService);
+        return provider;
     }
 }
