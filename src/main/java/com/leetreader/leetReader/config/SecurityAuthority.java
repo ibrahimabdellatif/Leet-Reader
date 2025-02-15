@@ -1,4 +1,4 @@
-package com.leetreader.leetReader.config.security;
+package com.leetreader.leetReader.config;
 
 import com.leetreader.leetReader.model.Authority;
 import lombok.AllArgsConstructor;

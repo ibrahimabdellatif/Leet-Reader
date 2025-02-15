@@ -1,6 +1,6 @@
 package com.leetreader.leetReader.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -48,7 +48,7 @@ public class User {
     @UpdateTimestamp
     private LocalDateTime updatedAt;
 
-    @JsonIgnore
+    @JsonManagedReference
     @OneToMany(mappedBy = "author")
     private List<Article> articles;
 
@@ -73,6 +73,6 @@ public class User {
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "authority_id")
     )
-   private Set<Authority> authorities;
+    private Set<Authority> authorities;
 
 }

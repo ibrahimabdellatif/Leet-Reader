@@ -36,10 +36,12 @@ public class UserController {
 
     @GetMapping
     public List<UserDTO> getAllUsers() {
+        String contextHolder = SecurityContextHolder.getContext().getAuthentication().getName();
+        System.out.println("contextHolder: " + contextHolder);
         return userService.getAllUsers();
     }
 
-    @PostMapping
+    @PostMapping("/adduser")
     public ResponseEntity<User> createUser(@RequestBody User user) {
         User savedUser = userService.createUser(user);
         return new ResponseEntity<>(savedUser, HttpStatus.CREATED);

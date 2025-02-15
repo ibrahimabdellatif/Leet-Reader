@@ -1,20 +1,23 @@
 package com.leetreader.leetReader.service;
 
+import com.leetreader.leetReader.config.SecurityUser;
 import com.leetreader.leetReader.dto.UserDTO;
 import com.leetreader.leetReader.dto.UserPasswordDTO;
 import com.leetreader.leetReader.mapper.UserDTOMapper;
 import com.leetreader.leetReader.model.User;
 import com.leetreader.leetReader.repository.UserRepository;
-import com.leetreader.leetReader.config.security.SecurityUser;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.*;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -24,8 +27,9 @@ public class UserService implements UserDetailsService {
 
     private final UserRepository userRepository;
     private final UserDTOMapper userDTOMapper;
+    private final PasswordEncoder passwordEncoder;
 
-//    it use for spring security authentication
+    //    it use for spring security authentication
     @Override
     public UserDetails loadUserByUsername(String username) {
         var user = userRepository.findUserByUsername(username);
@@ -52,10 +56,14 @@ public class UserService implements UserDetailsService {
     }
 
 //    public User findUserByUsername(String username) {
-//        return userRepository.findUserByUsername(username);
+//        return userRepository.findUserByUsername(username).orElseThrow();
 //    }
 
+    public void updateUserImageProfile(String username, String imageUrl){
+        userRepository.updateUserImageProfile(username,imageUrl);
+    }
     public User createUser(User user) {
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
         return userRepository.save(user);
     }
 
