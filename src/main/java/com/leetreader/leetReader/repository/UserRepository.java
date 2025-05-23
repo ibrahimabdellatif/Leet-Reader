@@ -28,6 +28,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     @Transactional
     @Modifying
-    @Query(value = "UPDATE User u SET u.profilePictureUrl = :image WHERE u.username= :username")
+    @Query(value = "UPDATE User u SET u.profilePictureUrl = :image, u.updatedAt = CURRENT_TIMESTAMP WHERE u.username= :username")
     void updateUserImageProfile(@Param("username") String username, @Param("image") String imageUrl);
 }

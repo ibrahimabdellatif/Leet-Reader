@@ -49,10 +49,10 @@ public class User {
     private LocalDateTime updatedAt;
 
     @JsonManagedReference
-    @OneToMany(mappedBy = "author")
+    @OneToMany(mappedBy = "author", fetch = FetchType.LAZY)
     private List<Article> articles;
 
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "user" , fetch = FetchType.LAZY)
     private List<Comment> comments;
 
     //    Following and followed
@@ -64,7 +64,7 @@ public class User {
     )
     Set<User> following = new HashSet<>();
 
-    @ManyToMany(mappedBy = "following")
+    @ManyToMany(mappedBy = "following" ,fetch = FetchType.LAZY)
     Set<User> followers = new HashSet<>();
 
 

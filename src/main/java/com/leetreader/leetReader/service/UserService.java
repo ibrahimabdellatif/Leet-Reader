@@ -59,9 +59,10 @@ public class UserService implements UserDetailsService {
 //        return userRepository.findUserByUsername(username).orElseThrow();
 //    }
 
-    public void updateUserImageProfile(String username, String imageUrl){
-        userRepository.updateUserImageProfile(username,imageUrl);
+    public void updateUserImageProfile(String username, String imageUrl) {
+        userRepository.updateUserImageProfile(username, imageUrl);
     }
+
     public User createUser(User user) {
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         return userRepository.save(user);
@@ -92,7 +93,7 @@ public class UserService implements UserDetailsService {
             throw new EntityNotFoundException("User with username " + username + " not found");
         }
 //        TODO: check if the old password is correct
-        if (!Objects.equals(userPasswordDTO.oldPassword(), userRepository.getUserPassword(username))) {
+        if (!passwordEncoder.matches(userPasswordDTO.oldPassword(), userRepository.getUserPassword(username))) {
             throw new EntityNotFoundException("Old password doesn't match");
         }
 //        TODO: check if the new password and confirmed one are equals
@@ -105,7 +106,7 @@ public class UserService implements UserDetailsService {
         }
 
 //        String hashedPassword =
-        userRepository.updateUserPassword(username, userPasswordDTO.newPassword());
+        userRepository.updateUserPassword(username, passwordEncoder.encode(userPasswordDTO.newPassword()));
         return successfulMessage;
     }
 /*

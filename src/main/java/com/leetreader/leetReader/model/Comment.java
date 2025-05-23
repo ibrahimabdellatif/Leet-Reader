@@ -19,7 +19,7 @@ public class Comment {
     @JoinColumn(name = "article_id")
     private Article article;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
     @Column(columnDefinition = "TEXT", nullable = false)

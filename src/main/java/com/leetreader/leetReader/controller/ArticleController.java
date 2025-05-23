@@ -1,11 +1,15 @@
 package com.leetreader.leetReader.controller;
 
 
+import com.leetreader.leetReader.dto.CreateArticleRequest;
 import com.leetreader.leetReader.model.Article;
 import com.leetreader.leetReader.service.ArticleService;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.context.annotation.ScopedProxyMode;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -27,4 +31,12 @@ public class ArticleController {
 //        articleService.addArticle(username,article);
 //        return ResponseEntity.status(HttpStatus.CREATED).body(article);
 //    }
+
+    @PostMapping
+    public ResponseEntity<Article> addArticle(@RequestBody CreateArticleRequest request){
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        var article = articleService.addArticle(username,request);
+        return new ResponseEntity<>(article , HttpStatus.CREATED);
+    }
+
 }

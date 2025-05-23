@@ -8,6 +8,12 @@ public class LeetReaderApplication {
 
 	public static void main(String[] args) {
 		SpringApplication.run(LeetReaderApplication.class, args);
+
+
+
+		
+
+
 	}
 
 }
