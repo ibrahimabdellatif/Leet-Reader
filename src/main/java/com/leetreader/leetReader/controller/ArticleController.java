@@ -2,17 +2,20 @@ package com.leetreader.leetReader.controller;
 
 
 import com.leetreader.leetReader.dto.CreateArticleRequest;
+import com.leetreader.leetReader.exception.DuplicateTitleException;
 import com.leetreader.leetReader.model.Article;
 import com.leetreader.leetReader.service.ArticleService;
-import org.springframework.context.annotation.ScopedProxyMode;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/v1/articles")
 public class ArticleController {
@@ -26,17 +29,34 @@ public class ArticleController {
     public List<Article> getArticles() {
         return articleService.getAllArticles();
     }
-//    @PostMapping("/@{username}")
-//    public ResponseEntity<Article> addArticle(@PathVariable String username ,@RequestBody Article article) {
-//        articleService.addArticle(username,article);
-//        return ResponseEntity.status(HttpStatus.CREATED).body(article);
-//    }
+
+    @GetMapping("/@{username}")
+    public List<Article> getArticlesByUsername(@PathVariable String username) {
+        return articleService.getArticlesByUsername(username);
+    }
+
+    @GetMapping("/@{username}/{title}")
+    public Optional<Article> getArticleByTitle(@PathVariable String username, @PathVariable String title) {
+        return articleService.getArticleByTitle(title, username);
+    }
 
     @PostMapping
-    public ResponseEntity<Article> addArticle(@RequestBody CreateArticleRequest request){
+    public ResponseEntity<?> addArticle(@RequestBody CreateArticleRequest request) {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
-        var article = articleService.addArticle(username,request);
-        return new ResponseEntity<>(article , HttpStatus.CREATED);
+        try {
+
+            var article = articleService.addArticle(username, request);
+            return ResponseEntity.status(HttpStatus.CREATED).body(article);
+
+        } catch (DuplicateTitleException e) {
+            log.error("Error posting article: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
+        } catch (UsernameNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User not found");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Server went wrong");
+        }
+
     }
 
 }
