@@ -9,6 +9,8 @@ import com.leetreader.leetReader.model.User;
 import com.leetreader.leetReader.repository.ArticleRepository;
 import com.leetreader.leetReader.repository.UserRepository;
 import jakarta.transaction.Transactional;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -69,6 +71,11 @@ public class ArticleService {
     }
 
     public Article updateArticle(String title, String username, CreateArticleRequest article) {
+
+        String authenticatedUsername = SecurityContextHolder.getContext().getAuthentication().getName();
+        if (!username.equals(authenticatedUsername))
+            throw new AccessDeniedException("You don't have access to edit this resource⛔");
+
         Article articleExist = findArticleByTitleAndUsername(title, username)
                 .orElseThrow(() -> new ArticleIsNotExist("The article you are try to edit is not exist"));
 

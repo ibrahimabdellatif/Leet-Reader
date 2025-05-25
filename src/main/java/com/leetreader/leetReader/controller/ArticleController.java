@@ -10,6 +10,7 @@ import com.leetreader.leetReader.service.ArticleService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
@@ -66,11 +67,13 @@ public class ArticleController {
 
         try {
             Article article = articleService.updateArticle(title, username, articleRequest);
-            return ResponseEntity.status(HttpStatus.OK).body(article);
+            return ResponseEntity.ok(article);
         } catch (ArticleIsNotExist exist) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(exist.getMessage());
-        }catch (InvalidEmptyInputException emptyInputException){
+        } catch (InvalidEmptyInputException emptyInputException) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(emptyInputException.getMessage());
+        } catch (AccessDeniedException deniedException) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(deniedException.getMessage());
         }
     }
 
