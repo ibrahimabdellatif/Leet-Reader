@@ -2,6 +2,8 @@ package com.leetreader.leetReader.controller;
 
 import com.leetreader.leetReader.dto.UserDTO;
 import com.leetreader.leetReader.dto.UserPasswordDTO;
+import com.leetreader.leetReader.exception.user.UserEmailIsExist;
+import com.leetreader.leetReader.exception.user.UsernameIsExist;
 import com.leetreader.leetReader.model.User;
 import com.leetreader.leetReader.service.UserService;
 import jakarta.persistence.EntityNotFoundException;
@@ -43,9 +45,13 @@ public class UserController {
     }
 
     @PostMapping("/adduser")
-    public ResponseEntity<User> createUser(@RequestBody User user) {
-        User savedUser = userService.createUser(user);
-        return new ResponseEntity<>(savedUser, HttpStatus.CREATED);
+    public ResponseEntity<?> createUser(@RequestBody User user) {
+        try {
+            User savedUser = userService.createUser(user);
+            return ResponseEntity.status(HttpStatus.CREATED).body(savedUser);
+        }catch (UsernameIsExist | UserEmailIsExist e){
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
+        }
     }
 
     @PatchMapping("/@{username}/change-password")

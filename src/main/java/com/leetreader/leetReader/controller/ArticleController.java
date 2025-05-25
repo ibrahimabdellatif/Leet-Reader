@@ -1,11 +1,10 @@
 package com.leetreader.leetReader.controller;
 
 
-import com.leetreader.leetReader.dto.ArticleDTO;
 import com.leetreader.leetReader.dto.CreateArticleRequest;
-import com.leetreader.leetReader.exception.ArticleIsNotExist;
-import com.leetreader.leetReader.exception.DuplicateTitleException;
-import com.leetreader.leetReader.exception.InvalidEmptyInputException;
+import com.leetreader.leetReader.exception.article.ArticleIsNotExist;
+import com.leetreader.leetReader.exception.article.DuplicateTitleException;
+import com.leetreader.leetReader.exception.article.InvalidEmptyInputException;
 import com.leetreader.leetReader.model.Article;
 import com.leetreader.leetReader.service.ArticleService;
 import lombok.extern.slf4j.Slf4j;

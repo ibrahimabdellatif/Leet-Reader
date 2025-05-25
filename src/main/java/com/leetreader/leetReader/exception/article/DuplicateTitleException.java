@@ -1,4 +1,4 @@
-package com.leetreader.leetReader.exception;
+package com.leetreader.leetReader.exception.article;
 
 public class DuplicateTitleException extends RuntimeException{
     public DuplicateTitleException(String message){

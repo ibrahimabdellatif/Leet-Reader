@@ -3,6 +3,8 @@ package com.leetreader.leetReader.service;
 import com.leetreader.leetReader.config.SecurityUser;
 import com.leetreader.leetReader.dto.UserDTO;
 import com.leetreader.leetReader.dto.UserPasswordDTO;
+import com.leetreader.leetReader.exception.user.UsernameIsExist;
+import com.leetreader.leetReader.exception.user.UserEmailIsExist;
 import com.leetreader.leetReader.mapper.UserDTOMapper;
 import com.leetreader.leetReader.model.User;
 import com.leetreader.leetReader.repository.UserRepository;
@@ -64,6 +66,12 @@ public class UserService implements UserDetailsService {
     }
 
     public User createUser(User user) {
+        boolean  userEmailIsExist= userRepository.findUserByEmail(user.getEmail()).isPresent();
+        boolean  usernameIsExist = userRepository.findUserByUsername(user.getUsername()).isPresent();
+
+        if (usernameIsExist) throw new UsernameIsExist("This username is exist before try another one");
+        if (userEmailIsExist) throw new UserEmailIsExist("This email is exist before try another one");
+
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         return userRepository.save(user);
     }
