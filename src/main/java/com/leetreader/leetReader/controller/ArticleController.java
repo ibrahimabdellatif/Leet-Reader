@@ -1,8 +1,11 @@
 package com.leetreader.leetReader.controller;
 
 
+import com.leetreader.leetReader.dto.ArticleDTO;
 import com.leetreader.leetReader.dto.CreateArticleRequest;
+import com.leetreader.leetReader.exception.ArticleIsNotExist;
 import com.leetreader.leetReader.exception.DuplicateTitleException;
+import com.leetreader.leetReader.exception.InvalidEmptyInputException;
 import com.leetreader.leetReader.model.Article;
 import com.leetreader.leetReader.service.ArticleService;
 import lombok.extern.slf4j.Slf4j;
@@ -57,6 +60,19 @@ public class ArticleController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Server went wrong");
         }
 
+    }
+
+    @PatchMapping("/@{username}/{title}")
+    public ResponseEntity<?> updateArticle(@PathVariable String username, @PathVariable String title, @RequestBody CreateArticleRequest articleRequest) {
+
+        try {
+            Article article = articleService.updateArticle(title, username, articleRequest);
+            return ResponseEntity.status(HttpStatus.OK).body(article);
+        } catch (ArticleIsNotExist exist) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(exist.getMessage());
+        }catch (InvalidEmptyInputException emptyInputException){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(emptyInputException.getMessage());
+        }
     }
 
 }

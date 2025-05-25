@@ -11,6 +11,7 @@ public interface ArticleRepository extends JpaRepository<Article, Long> {
     //    List<Article> findByAuthorId(Long authorId);
     List<Article> findArticlesByAuthor_Username(String username);
 
-    //    we need to make the article finded by title and the author
+    //    we need to make the article found by title and the author
     Optional<Article> findArticleByTitleAndAuthor_Username(String title, String username);
+//    int countArticleByTitleAndAuthor_Username(String title,String username);
 }
