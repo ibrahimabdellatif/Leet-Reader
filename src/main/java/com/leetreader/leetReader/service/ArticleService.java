@@ -66,33 +66,38 @@ public class ArticleService {
         return articleRepository.save(newArticle);
     }
 
-    public Optional<Article> findArticleByTitleAndUsername(String title, String username) {
-        return articleRepository.findArticleByTitleAndAuthor_Username(title, username);
-    }
-
-    public Article updateArticle(String title, String username, CreateArticleRequest article) {
-
-        String authenticatedUsername = SecurityContextHolder.getContext().getAuthentication().getName();
-        if (!username.equals(authenticatedUsername))
-            throw new AccessDeniedException("You don't have access to edit this resource⛔");
-
-        Article articleExist = findArticleByTitleAndUsername(title, username)
-                .orElseThrow(() -> new ArticleIsNotExist("The article you are try to edit is not exist"));
+    public Article updateArticle(Long articleId, CreateArticleRequest article) {
+        Article existedArticle = authorizeUserAndExistingOfArticle(articleId, "update");
 
 //        StringUtils is a class add by spring to check for null and empty string
-        if (StringUtils.hasText(article.title())) articleExist.setTitle(article.title());
-        if (StringUtils.hasText(article.content())) articleExist.setContent(article.content());
+        if (StringUtils.hasText(article.title())) existedArticle.setTitle(article.title());
+        if (StringUtils.hasText(article.content())) existedArticle.setContent(article.content());
 
         if (!StringUtils.hasText(article.title()) && !StringUtils.hasText(article.content())) {
             throw new InvalidEmptyInputException("you must update at least one field.");
         }
-        articleExist.setUpdatedAt(LocalDateTime.now());
-        return articleRepository.save(articleExist);
+        existedArticle.setUpdatedAt(LocalDateTime.now());
+        return articleRepository.save(existedArticle);
     }
 
+    @Transactional
     public void deleteArticle(Long articleId) {
+
+        authorizeUserAndExistingOfArticle(articleId, "delete");
         articleRepository.deleteById(articleId);
     }
 
+    private Article authorizeUserAndExistingOfArticle(Long articleId, String action) {
+        String authenticatedUsername = SecurityContextHolder.getContext().getAuthentication().getName();
+        User authenitcatedUser = userRepository.findUserByUsername(authenticatedUsername)
+                .orElseThrow(() -> new UsernameNotFoundException("This user is not found"));
 
+        Article existedArticle = articleRepository.findById(articleId)
+                .orElseThrow(() -> new ArticleIsNotExist("the article you try to " + action + " is not exist."));
+
+        if (!authenitcatedUser.getId().equals(existedArticle.getAuthor().getId())) {
+            throw new AccessDeniedException("You don't have access to " + action + " this resource⛔");
+        }
+        return existedArticle;
+    }
 }

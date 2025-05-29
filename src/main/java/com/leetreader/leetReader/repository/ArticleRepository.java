@@ -13,5 +13,7 @@ public interface ArticleRepository extends JpaRepository<Article, Long> {
 
     //    we need to make the article found by title and the author
     Optional<Article> findArticleByTitleAndAuthor_Username(String title, String username);
-//    int countArticleByTitleAndAuthor_Username(String title,String username);
+    Optional<Article> findArticleByIdAndAuthor_Id(Long articleId, Long authorId);
+
+    void deleteArticleByTitleAndAuthor_Username(String title,String username);
 }

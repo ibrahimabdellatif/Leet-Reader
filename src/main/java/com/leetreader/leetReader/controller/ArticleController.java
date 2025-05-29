@@ -62,11 +62,10 @@ public class ArticleController {
 
     }
 
-    @PatchMapping("/@{username}/{title}")
-    public ResponseEntity<?> updateArticle(@PathVariable String username, @PathVariable String title, @RequestBody CreateArticleRequest articleRequest) {
-
+    @PatchMapping("/{articleId}")
+    public ResponseEntity<?> updateArticle(@PathVariable Long articleId, @RequestBody CreateArticleRequest articleRequest) {
         try {
-            Article article = articleService.updateArticle(title, username, articleRequest);
+            Article article = articleService.updateArticle(articleId, articleRequest);
             return ResponseEntity.ok(article);
         } catch (ArticleIsNotExist exist) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(exist.getMessage());
@@ -74,6 +73,18 @@ public class ArticleController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(emptyInputException.getMessage());
         } catch (AccessDeniedException deniedException) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(deniedException.getMessage());
+        }
+    }
+
+    @DeleteMapping("/{articleId}")
+    public ResponseEntity<?> deleteArticle(@PathVariable Long articleId) {
+        try {
+            articleService.deleteArticle(articleId);
+            return ResponseEntity.ok("Article deleted successfully");
+        } catch (ArticleIsNotExist e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        } catch (AccessDeniedException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage());
         }
     }
 
