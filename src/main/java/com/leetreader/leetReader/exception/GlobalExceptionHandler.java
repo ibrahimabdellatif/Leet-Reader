@@ -3,6 +3,8 @@ package com.leetreader.leetReader.exception;
 import com.leetreader.leetReader.exception.article.ArticleIsNotExist;
 import com.leetreader.leetReader.exception.article.DuplicateTitleException;
 import com.leetreader.leetReader.exception.article.InvalidEmptyInputException;
+import com.leetreader.leetReader.exception.user.PasswordMissMatchException;
+import com.leetreader.leetReader.exception.user.PasswordReuseException;
 import com.leetreader.leetReader.exception.user.UserEmailIsExist;
 import com.leetreader.leetReader.exception.user.UsernameIsExist;
 import jakarta.persistence.EntityNotFoundException;
@@ -72,6 +74,20 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<?> handleIllegalArgumentException(IllegalArgumentException exception, HttpServletRequest request) {
+        ErrorResponse response = getErrorResponse(HttpStatus.BAD_REQUEST, exception.getMessage(), request);
+
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(PasswordMissMatchException.class)
+    public ResponseEntity<?> handleBadRequestException(PasswordMissMatchException exception, HttpServletRequest request) {
+        ErrorResponse response = getErrorResponse(HttpStatus.BAD_REQUEST, exception.getMessage(), request);
+
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(PasswordReuseException.class)
+    public ResponseEntity<?> handlePasswordReuseException(PasswordReuseException exception, HttpServletRequest request) {
         ErrorResponse response = getErrorResponse(HttpStatus.BAD_REQUEST, exception.getMessage(), request);
 
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);

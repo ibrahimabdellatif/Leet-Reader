@@ -3,8 +3,10 @@ package com.leetreader.leetReader.service;
 import com.leetreader.leetReader.config.SecurityUser;
 import com.leetreader.leetReader.dto.UserDTO;
 import com.leetreader.leetReader.dto.UserPasswordDTO;
-import com.leetreader.leetReader.exception.user.UsernameIsExist;
+import com.leetreader.leetReader.exception.user.PasswordMissMatchException;
+import com.leetreader.leetReader.exception.user.PasswordReuseException;
 import com.leetreader.leetReader.exception.user.UserEmailIsExist;
+import com.leetreader.leetReader.exception.user.UsernameIsExist;
 import com.leetreader.leetReader.mapper.UserDTOMapper;
 import com.leetreader.leetReader.model.User;
 import com.leetreader.leetReader.repository.UserRepository;
@@ -66,8 +68,8 @@ public class UserService implements UserDetailsService {
     }
 
     public User createUser(User user) {
-        boolean  userEmailIsExist= userRepository.findUserByEmail(user.getEmail()).isPresent();
-        boolean  usernameIsExist = userRepository.findUserByUsername(user.getUsername()).isPresent();
+        boolean userEmailIsExist = userRepository.findUserByEmail(user.getEmail()).isPresent();
+        boolean usernameIsExist = userRepository.findUserByUsername(user.getUsername()).isPresent();
 
         if (usernameIsExist) throw new UsernameIsExist("This username is exist before try another one");
         if (userEmailIsExist) throw new UserEmailIsExist("This email is exist before try another one");
@@ -95,22 +97,18 @@ public class UserService implements UserDetailsService {
     public String updateUserPassword(String username, UserPasswordDTO userPasswordDTO) {
         String successfulMessage = "The user password is update successfully";
 
-//        TODO: check if the username was existed or not
         Optional<UserDTO> userDTO = userRepository.findByUsername(username);
         if (userDTO.isEmpty()) {
             throw new EntityNotFoundException("User with username " + username + " not found");
         }
-//        TODO: check if the old password is correct
         if (!passwordEncoder.matches(userPasswordDTO.oldPassword(), userRepository.getUserPassword(username))) {
             throw new EntityNotFoundException("Old password doesn't match");
         }
-//        TODO: check if the new password and confirmed one are equals
         if (!Objects.equals(userPasswordDTO.newPassword(), userPasswordDTO.confirmPassword())) {
-            throw new EntityNotFoundException("The confirm password is incorrect");
+            throw new PasswordMissMatchException("The confirm password is incorrect");
         }
-//        TODO: check if the old password is equal to the new one
         if (Objects.equals(userPasswordDTO.oldPassword(), userPasswordDTO.newPassword())) {
-            throw new EntityNotFoundException("your new password is the same as the old password");
+            throw new PasswordReuseException("your new password is the same as the old password");
         }
 
 //        String hashedPassword =
