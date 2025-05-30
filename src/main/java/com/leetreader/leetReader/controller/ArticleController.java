@@ -68,7 +68,8 @@ public class ArticleController {
             Article article = articleService.updateArticle(articleId, articleRequest);
             return ResponseEntity.ok(article);
         }
-//        now we don't need to catch these exception here because we handle it in the below method.
+//        now we don't need to catch these exception here because we handle it in GlobalExceptionHandler using ControllerAdvice.
+//        and make it return a meaningful JSON ErrorResponse payload
 //        catch (ArticleIsNotExist exist) {
 //            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(exist.getMessage());
 //        }
@@ -90,14 +91,4 @@ public class ArticleController {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage());
         }
     }
-
-    //    this is for if you try to handle the exception without try and catch inside method controller
-//    but if you have lots of controller and need to handle same exceptions you need to add like this method
-//    on the controller that have these exceptions so, there is a better way with Global Exception handler using @ControllerAdvice Annotation
-//    and in this class you add your Exception handling methods like there below
-    @ExceptionHandler(ArticleIsNotExist.class)
-    public ResponseEntity<?> handleException(ArticleIsNotExist exception) {
-        return ResponseEntity.badRequest().body("HELLO FROM EXCEPTION HANDLER");
-    }
-
 }
