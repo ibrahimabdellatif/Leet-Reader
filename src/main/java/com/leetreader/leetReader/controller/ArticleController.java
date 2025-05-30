@@ -67,9 +67,12 @@ public class ArticleController {
         try {
             Article article = articleService.updateArticle(articleId, articleRequest);
             return ResponseEntity.ok(article);
-        } catch (ArticleIsNotExist exist) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(exist.getMessage());
-        } catch (InvalidEmptyInputException emptyInputException) {
+        }
+//        now we don't need to catch these exception here because we handle it in the below method.
+//        catch (ArticleIsNotExist exist) {
+//            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(exist.getMessage());
+//        }
+        catch (InvalidEmptyInputException emptyInputException) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(emptyInputException.getMessage());
         } catch (AccessDeniedException deniedException) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(deniedException.getMessage());
@@ -86,6 +89,15 @@ public class ArticleController {
         } catch (AccessDeniedException e) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage());
         }
+    }
+
+    //    this is for if you try to handle the exception without try and catch inside method controller
+//    but if you have lots of controller and need to handle same exceptions you need to add like this method
+//    on the controller that have these exceptions so, there is a better way with Global Exception handler using @ControllerAdvice Annotation
+//    and in this class you add your Exception handling methods like there below
+    @ExceptionHandler(ArticleIsNotExist.class)
+    public ResponseEntity<?> handleException(ArticleIsNotExist exception) {
+        return ResponseEntity.badRequest().body("HELLO FROM EXCEPTION HANDLER");
     }
 
 }
