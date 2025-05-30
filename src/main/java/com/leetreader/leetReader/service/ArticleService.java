@@ -9,13 +9,11 @@ import com.leetreader.leetReader.model.User;
 import com.leetreader.leetReader.repository.ArticleRepository;
 import com.leetreader.leetReader.repository.UserRepository;
 import jakarta.transaction.Transactional;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
-import org.springframework.web.bind.annotation.ExceptionHandler;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -56,10 +54,7 @@ public class ArticleService {
 
         Article newArticle = new Article();
 
-        Optional<Article> articleByTitleAndAuthorUsername = articleRepository.findArticleByTitleAndAuthor_Username(article.title(), username);
-        if (articleByTitleAndAuthorUsername.isPresent()) {
-            throw new DuplicateTitleException("⚠ You've used this title before. Please try another one!");
-        }
+        isArticleTitleExistsForUser(article.title(), username);
 
         newArticle.setAuthor(author);
         newArticle.setTitle(article.title());
@@ -69,6 +64,9 @@ public class ArticleService {
     }
 
     public Article updateArticle(Long articleId, CreateArticleRequest article) {
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        isArticleTitleExistsForUser(article.title(), username);
+
         Article existedArticle = authorizeUserAndExistingOfArticle(articleId, "update");
 
 //        StringUtils is a class add by spring to check for null and empty string
@@ -101,5 +99,12 @@ public class ArticleService {
             throw new AccessDeniedException("You don't have access to " + action + " this resource⛔");
         }
         return existedArticle;
+    }
+
+    private void isArticleTitleExistsForUser(String articleTitle, String username) {
+        Optional<Article> articleByTitleAndAuthorUsername = articleRepository.findArticleByTitleAndAuthor_Username(articleTitle, username);
+        if (articleByTitleAndAuthorUsername.isPresent()) {
+            throw new DuplicateTitleException("⚠ You've used this title before. Please try another one!");
+        }
     }
 }
