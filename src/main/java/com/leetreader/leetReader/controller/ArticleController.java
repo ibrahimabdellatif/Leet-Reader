@@ -4,7 +4,6 @@ package com.leetreader.leetReader.controller;
 import com.leetreader.leetReader.dto.CreateArticleRequest;
 import com.leetreader.leetReader.model.Article;
 import com.leetreader.leetReader.service.ArticleService;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -13,7 +12,6 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Optional;
 
-@Slf4j
 @RestController
 @RequestMapping("/api/v1/articles")
 public class ArticleController {

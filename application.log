@@ -271,3 +271,7 @@
 2025-05-31T15:19:35.667+03:00  INFO 1856 --- [leetReader] [http-nio-8080-exec-2] o.s.web.servlet.DispatcherServlet        : Completed initialization in 2 ms
 2025-05-31T15:19:36.279+03:00 ERROR 1856 --- [leetReader] [http-nio-8080-exec-2] c.l.l.exception.GlobalExceptionHandler   : DuplicateTitleException ⚠ You've used this title before. Please try another one!, with path /api/v1/articles/9
 2025-05-31T15:19:54.414+03:00 ERROR 1856 --- [leetReader] [http-nio-8080-exec-3] c.l.l.exception.GlobalExceptionHandler   : ArticleIsNotExist: the article you try to delete is not exist., Path/api/v1/articles/97
+2025-05-31T16:44:20.313+03:00  WARN 1856 --- [leetReader] [HikariPool-1 housekeeper] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=45m14s841ms494µs600ns).
+2025-05-31T16:51:40.529+03:00  INFO 1856 --- [leetReader] [SpringApplicationShutdownHook] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2025-05-31T16:51:40.536+03:00  INFO 1856 --- [leetReader] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
+2025-05-31T16:51:40.558+03:00  INFO 1856 --- [leetReader] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.

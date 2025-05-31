@@ -52,6 +52,7 @@ public class User {
     @OneToMany(mappedBy = "author", fetch = FetchType.LAZY)
     private List<Article> articles;
 
+    @JsonManagedReference
     @OneToMany(mappedBy = "user" , fetch = FetchType.LAZY)
     private List<Comment> comments;
 
