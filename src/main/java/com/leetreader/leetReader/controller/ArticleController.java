@@ -1,7 +1,7 @@
 package com.leetreader.leetReader.controller;
 
 
-import com.leetreader.leetReader.dto.CreateArticleRequest;
+import com.leetreader.leetReader.dto.article.CreateArticleRequest;
 import com.leetreader.leetReader.model.Article;
 import com.leetreader.leetReader.service.ArticleService;
 import org.springframework.http.HttpStatus;

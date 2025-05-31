@@ -1,6 +1,6 @@
 package com.leetreader.leetReader.service;
 
-import com.leetreader.leetReader.dto.CreateCommentDTO;
+import com.leetreader.leetReader.dto.comment.CreateCommentDTO;
 import com.leetreader.leetReader.exception.article.ArticleIsNotExist;
 import com.leetreader.leetReader.model.Article;
 import com.leetreader.leetReader.model.Comment;

@@ -1,8 +1,8 @@
 package com.leetreader.leetReader.controller;
 
-import com.leetreader.leetReader.dto.UserDTO;
-import com.leetreader.leetReader.dto.UserPasswordDTO;
-import com.leetreader.leetReader.model.User;
+import com.leetreader.leetReader.dto.user.UserCreationDTO;
+import com.leetreader.leetReader.dto.user.UserPasswordDTO;
+import com.leetreader.leetReader.dto.user.UserResponseDTO;
 import com.leetreader.leetReader.service.UserService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -23,23 +23,23 @@ public class UserController {
 
 
     @GetMapping("/{id}")
-    public UserDTO getUserById(@PathVariable Long id) {
+    public UserResponseDTO getUserById(@PathVariable Long id) {
         return userService.getUserById(id);
     }
 
     @GetMapping("/@{username}")
-    public Optional<UserDTO> getUserByUsername(@PathVariable String username) {
+    public Optional<UserResponseDTO> getUserByUsername(@PathVariable String username) {
         return userService.getUserByUsername(username);
     }
 
     @GetMapping
-    public List<UserDTO> getAllUsers() {
+    public List<UserResponseDTO> getAllUsers() {
         return userService.getAllUsers();
     }
 
     @PostMapping("/adduser")
-    public ResponseEntity<?> createUser(@RequestBody User user) {
-        User savedUser = userService.createUser(user);
+    public ResponseEntity<?> createUser(@Valid @RequestBody UserCreationDTO user) {
+        UserResponseDTO savedUser = userService.createUser(user);
         return ResponseEntity.status(HttpStatus.CREATED).body(savedUser);
     }
 

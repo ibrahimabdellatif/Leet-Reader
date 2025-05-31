@@ -1,4 +1,4 @@
-package com.leetreader.leetReader.dto;
+package com.leetreader.leetReader.dto.user;
 
 
 import javax.validation.constraints.NotBlank;

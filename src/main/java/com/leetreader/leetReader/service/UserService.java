@@ -1,8 +1,9 @@
 package com.leetreader.leetReader.service;
 
 import com.leetreader.leetReader.config.SecurityUser;
-import com.leetreader.leetReader.dto.UserDTO;
-import com.leetreader.leetReader.dto.UserPasswordDTO;
+import com.leetreader.leetReader.dto.user.UserCreationDTO;
+import com.leetreader.leetReader.dto.user.UserPasswordDTO;
+import com.leetreader.leetReader.dto.user.UserResponseDTO;
 import com.leetreader.leetReader.exception.user.PasswordMissMatchException;
 import com.leetreader.leetReader.exception.user.PasswordReuseException;
 import com.leetreader.leetReader.exception.user.UserEmailIsExist;
@@ -42,20 +43,20 @@ public class UserService implements UserDetailsService {
                 .orElseThrow(() -> new UsernameNotFoundException(username));
     }
 
-    public List<UserDTO> getAllUsers() {
+    public List<UserResponseDTO> getAllUsers() {
         return userRepository.findAll()
                 .stream()
                 .map(userDTOMapper)
                 .collect(Collectors.toList());
     }
 
-    public UserDTO getUserById(Long id) {
+    public UserResponseDTO getUserById(Long id) {
         return userRepository.findById(id)
                 .map(userDTOMapper)
                 .orElseThrow(EntityNotFoundException::new);
     }
 
-    public Optional<UserDTO> getUserByUsername(String username) {
+    public Optional<UserResponseDTO> getUserByUsername(String username) {
         return userRepository.findByUsername(username);
     }
 
@@ -67,37 +68,47 @@ public class UserService implements UserDetailsService {
         userRepository.updateUserImageProfile(username, imageUrl);
     }
 
-    public User createUser(User user) {
-        boolean userEmailIsExist = userRepository.findUserByEmail(user.getEmail()).isPresent();
-        boolean usernameIsExist = userRepository.findUserByUsername(user.getUsername()).isPresent();
+    public UserResponseDTO createUser(UserCreationDTO user) {
+        boolean userEmailIsExist = userRepository.findUserByEmail(user.email()).isPresent();
+        boolean usernameIsExist = userRepository.findUserByUsername(user.username()).isPresent();
 
         if (usernameIsExist) throw new UsernameIsExist("This username is exist before try another one");
         if (userEmailIsExist) throw new UserEmailIsExist("This email is exist before try another one");
+        User savedUser = new User();
+        savedUser.setBio(user.bio());
+        savedUser.setEmail(user.email());
+        savedUser.setFirstName(user.firstName());
+        savedUser.setLastName(user.lastName());
+        savedUser.setPassword(passwordEncoder.encode(user.password()));
+        savedUser.setUsername(user.username());
+        userRepository.save(savedUser);
 
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
-        return userRepository.save(user);
+        UserDTOMapper mapper = new UserDTOMapper();
+
+        return mapper.apply(savedUser);
     }
 
-    public UserDTO updateUser(String username, User user) {
-        if (user == null || user.getId() == null) {
-            throw new IllegalArgumentException("User or user id is null");
-        }
-        if (!userRepository.existsById(user.getId())) {
-            throw new EntityNotFoundException("User with id " + user.getId() + " not found");
-        }
+//    public UserCreationDTO updateUser(String username, User user) {
+//        if (user == null || user.getId() == null) {
+//            throw new IllegalArgumentException("User or user id is null");
+//        }
+//        if (!userRepository.existsById(user.getId())) {
+//            throw new EntityNotFoundException("User with id " + user.getId() + " not found");
+//        }
+//
 
-//        UserDTO userDTO = getUserByUsername(username);
-
-        User updatedUser = userRepository.save(user);
-        return userDTOMapper.apply(updatedUser);
-    }
+    /// /        UserDTO userDTO = getUserByUsername(username);
+//
+//        User updatedUser = userRepository.save(user);
+//        return userDTOMapper.apply(updatedUser);
+//    }
 
     //You never need to pass the full User entity in get request or as a returned type of update or post
     @Transactional
     public String updateUserPassword(String username, UserPasswordDTO userPasswordDTO) {
         String successfulMessage = "The user password is update successfully";
 
-        Optional<UserDTO> userDTO = userRepository.findByUsername(username);
+        Optional<UserResponseDTO> userDTO = userRepository.findByUsername(username);
         if (userDTO.isEmpty()) {
             throw new EntityNotFoundException("User with username " + username + " not found");
         }

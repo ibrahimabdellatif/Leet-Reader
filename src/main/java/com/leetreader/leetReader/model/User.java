@@ -76,4 +76,8 @@ public class User {
     )
     private Set<Authority> authorities;
 
+    @PrePersist
+    protected void onCreate(){
+        this.createdAt = LocalDateTime.now();
+    }
 }

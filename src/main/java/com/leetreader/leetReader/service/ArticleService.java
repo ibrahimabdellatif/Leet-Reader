@@ -1,6 +1,6 @@
 package com.leetreader.leetReader.service;
 
-import com.leetreader.leetReader.dto.CreateArticleRequest;
+import com.leetreader.leetReader.dto.article.CreateArticleRequest;
 import com.leetreader.leetReader.exception.article.ArticleIsNotExist;
 import com.leetreader.leetReader.exception.article.DuplicateTitleException;
 import com.leetreader.leetReader.exception.article.InvalidEmptyInputException;
