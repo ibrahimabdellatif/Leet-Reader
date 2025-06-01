@@ -4,6 +4,7 @@ import com.leetreader.leetReader.config.SecurityUser;
 import com.leetreader.leetReader.dto.comment.CreateCommentDTO;
 import com.leetreader.leetReader.service.CommentService;
 import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -23,5 +24,11 @@ public class CommentController {
         Long authenticatedUserId = securityUser.getUserId();
         commentService.addComment(authenticatedUserId, articleId, commentDTO);
         return ResponseEntity.ok().body("Comment posted successfully.😊");
+    }
+
+    @DeleteMapping("{id}")
+    public ResponseEntity<String> deleteComment(@PathVariable Long id){
+        commentService.deleteCommentById(id);
+        return new ResponseEntity<>("comment deleted successfully",HttpStatus.OK);
     }
 }

@@ -2,6 +2,7 @@ package com.leetreader.leetReader.service;
 
 import com.leetreader.leetReader.dto.comment.CreateCommentDTO;
 import com.leetreader.leetReader.exception.article.ArticleIsNotExist;
+import com.leetreader.leetReader.exception.user.ForbiddenException;
 import com.leetreader.leetReader.model.Article;
 import com.leetreader.leetReader.model.Comment;
 import com.leetreader.leetReader.model.User;
@@ -9,6 +10,7 @@ import com.leetreader.leetReader.repository.ArticleRepository;
 import com.leetreader.leetReader.repository.CommentRepository;
 import com.leetreader.leetReader.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -47,11 +49,18 @@ public class CommentService {
         commentRepository.save(comment);
     }
 
-    public Comment updateComment(Comment comment) {
-        return commentRepository.save(comment);
-    }
+//    public Comment updateComment(Comment comment) {
+//        return commentRepository.save(comment);
+//    }
 
     public void deleteCommentById(Long commentId) {
+
+        Comment comment = commentRepository.findById(commentId)
+                .orElseThrow(() -> new EntityNotFoundException("The comment is not found"));
+        String commentUsername = comment.getUser().getUsername();
+        String authenticatedUsername = SecurityContextHolder.getContext().getAuthentication().getName();
+        if (!authenticatedUsername.equals(commentUsername))
+            throw new ForbiddenException("You Don't have access to delete this comment!");
         commentRepository.deleteById(commentId);
     }
 
