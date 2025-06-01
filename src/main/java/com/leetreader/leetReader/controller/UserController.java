@@ -1,5 +1,6 @@
 package com.leetreader.leetReader.controller;
 
+import com.leetreader.leetReader.dto.user.UpdateUserDTO;
 import com.leetreader.leetReader.dto.user.UserCreationDTO;
 import com.leetreader.leetReader.dto.user.UserPasswordDTO;
 import com.leetreader.leetReader.dto.user.UserResponseDTO;
@@ -47,5 +48,10 @@ public class UserController {
     public ResponseEntity<String> updateUserPassword(@PathVariable String username, @Valid @RequestBody UserPasswordDTO userPasswordDTO) {
         String result = userService.updateUserPassword(username, userPasswordDTO);
         return new ResponseEntity<>(result, HttpStatus.OK);
+    }
+    @PatchMapping("/@{username}/update")
+    public ResponseEntity<?> updateUser(@PathVariable String username, @Valid @RequestBody UpdateUserDTO updateUserDTO) {
+        UserResponseDTO userResponseDTO = userService.updateUser(username, updateUserDTO);
+        return ResponseEntity.ok().body(userResponseDTO);
     }
 }

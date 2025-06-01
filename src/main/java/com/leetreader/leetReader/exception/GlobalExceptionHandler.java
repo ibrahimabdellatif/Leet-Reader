@@ -3,10 +3,7 @@ package com.leetreader.leetReader.exception;
 import com.leetreader.leetReader.exception.article.ArticleIsNotExist;
 import com.leetreader.leetReader.exception.article.DuplicateTitleException;
 import com.leetreader.leetReader.exception.article.InvalidEmptyInputException;
-import com.leetreader.leetReader.exception.user.PasswordMissMatchException;
-import com.leetreader.leetReader.exception.user.PasswordReuseException;
-import com.leetreader.leetReader.exception.user.UserEmailIsExist;
-import com.leetreader.leetReader.exception.user.UsernameIsExist;
+import com.leetreader.leetReader.exception.user.*;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
@@ -18,7 +15,6 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
-import java.nio.file.AccessDeniedException;
 import java.time.LocalDateTime;
 
 @ControllerAdvice
@@ -76,10 +72,10 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
     }
 
-    @ExceptionHandler(AccessDeniedException.class)
-    public ResponseEntity<?> handleAccessDeniedException(AccessDeniedException exception, HttpServletRequest request) {
+    @ExceptionHandler(ForbiddenException.class)
+    public ResponseEntity<?> handleForbiddenException(ForbiddenException exception, HttpServletRequest request) {
         ErrorResponse response = getErrorResponse(HttpStatus.FORBIDDEN, exception.getMessage(), request);
-        log.error("AccessDeniedException:{}, path request {}", exception.getMessage(), request.getRequestURI());
+        log.error("ForbiddenAndAccessDeniedException:{}, path request {}", exception.getMessage(), request.getRequestURI());
         return new ResponseEntity<>(response, HttpStatus.FORBIDDEN);
     }
 

@@ -4,12 +4,12 @@ import com.leetreader.leetReader.dto.article.CreateArticleRequest;
 import com.leetreader.leetReader.exception.article.ArticleIsNotExist;
 import com.leetreader.leetReader.exception.article.DuplicateTitleException;
 import com.leetreader.leetReader.exception.article.InvalidEmptyInputException;
+import com.leetreader.leetReader.exception.user.ForbiddenException;
 import com.leetreader.leetReader.model.Article;
 import com.leetreader.leetReader.model.User;
 import com.leetreader.leetReader.repository.ArticleRepository;
 import com.leetreader.leetReader.repository.UserRepository;
 import jakarta.transaction.Transactional;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
@@ -96,7 +96,7 @@ public class ArticleService {
                 .orElseThrow(() -> new ArticleIsNotExist("the article you try to " + action + " is not exist."));
 
         if (!authenitcatedUser.getId().equals(existedArticle.getAuthor().getId())) {
-            throw new AccessDeniedException("You don't have access to " + action + " this resource⛔");
+            throw new ForbiddenException("You don't have access to " + action + " this resource⛔");
         }
         return existedArticle;
     }

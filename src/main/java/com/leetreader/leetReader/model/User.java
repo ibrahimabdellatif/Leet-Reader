@@ -2,6 +2,7 @@ package com.leetreader.leetReader.model;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -9,7 +10,6 @@ import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
-import javax.validation.constraints.Email;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.List;
@@ -53,7 +53,7 @@ public class User {
     private List<Article> articles;
 
     @JsonManagedReference
-    @OneToMany(mappedBy = "user" , fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
     private List<Comment> comments;
 
     //    Following and followed
@@ -65,7 +65,7 @@ public class User {
     )
     Set<User> following = new HashSet<>();
 
-    @ManyToMany(mappedBy = "following" ,fetch = FetchType.LAZY)
+    @ManyToMany(mappedBy = "following", fetch = FetchType.LAZY)
     Set<User> followers = new HashSet<>();
 
 
@@ -77,7 +77,12 @@ public class User {
     private Set<Authority> authorities;
 
     @PrePersist
-    protected void onCreate(){
+    protected void onCreate() {
         this.createdAt = LocalDateTime.now();
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        this.updatedAt = LocalDateTime.now();
     }
 }

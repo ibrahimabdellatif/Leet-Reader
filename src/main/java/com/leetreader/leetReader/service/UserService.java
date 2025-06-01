@@ -1,24 +1,24 @@
 package com.leetreader.leetReader.service;
 
 import com.leetreader.leetReader.config.SecurityUser;
+import com.leetreader.leetReader.dto.user.UpdateUserDTO;
 import com.leetreader.leetReader.dto.user.UserCreationDTO;
 import com.leetreader.leetReader.dto.user.UserPasswordDTO;
 import com.leetreader.leetReader.dto.user.UserResponseDTO;
-import com.leetreader.leetReader.exception.user.PasswordMissMatchException;
-import com.leetreader.leetReader.exception.user.PasswordReuseException;
-import com.leetreader.leetReader.exception.user.UserEmailIsExist;
-import com.leetreader.leetReader.exception.user.UsernameIsExist;
+import com.leetreader.leetReader.exception.user.*;
 import com.leetreader.leetReader.mapper.UserDTOMapper;
 import com.leetreader.leetReader.model.User;
 import com.leetreader.leetReader.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import java.util.List;
 import java.util.Objects;
@@ -88,28 +88,36 @@ public class UserService implements UserDetailsService {
         return mapper.apply(savedUser);
     }
 
-//    public UserCreationDTO updateUser(String username, User user) {
-//        if (user == null || user.getId() == null) {
-//            throw new IllegalArgumentException("User or user id is null");
-//        }
-//        if (!userRepository.existsById(user.getId())) {
-//            throw new EntityNotFoundException("User with id " + user.getId() + " not found");
-//        }
-//
+    public UserResponseDTO updateUser(String username, UpdateUserDTO updateUserDTO) {
+        String authenticatedUsername = SecurityContextHolder.getContext().getAuthentication().getName();
+        if (!authenticatedUsername.equals(username))
+            throw new ForbiddenException("You don't have permission to update this user: " + username);
+        User updatedUser = userRepository.findUserByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException("The user with username: " + username + " you try to update is not exist"));
 
-    /// /        UserDTO userDTO = getUserByUsername(username);
-//
-//        User updatedUser = userRepository.save(user);
-//        return userDTOMapper.apply(updatedUser);
-//    }
+        if (StringUtils.hasText(updateUserDTO.firstName()))
+            updatedUser.setFirstName(updateUserDTO.firstName());
+        if (StringUtils.hasText(updateUserDTO.lastName()))
+            updatedUser.setLastName(updateUserDTO.lastName());
+        if (StringUtils.hasText(updateUserDTO.bio()))
+            updatedUser.setBio(updateUserDTO.bio());
+        if (StringUtils.hasText(updateUserDTO.email())) {
+            if (userRepository.findUserByEmail(updateUserDTO.email()).isPresent()) {
+                throw new UserEmailIsExist("This email is not available!" + updateUserDTO.email());
+            }
+            updatedUser.setEmail(updateUserDTO.email());
+        }
+        userRepository.save(updatedUser);
+        return userDTOMapper.apply(updatedUser);
+    }
 
     //You never need to pass the full User entity in get request or as a returned type of update or post
     @Transactional
     public String updateUserPassword(String username, UserPasswordDTO userPasswordDTO) {
         String successfulMessage = "The user password is update successfully";
 
-        Optional<UserResponseDTO> userDTO = userRepository.findByUsername(username);
-        if (userDTO.isEmpty()) {
+        Optional<User> user = userRepository.findUserByUsername(username);
+        if (user.isEmpty()) {
             throw new EntityNotFoundException("User with username " + username + " not found");
         }
         if (!passwordEncoder.matches(userPasswordDTO.oldPassword(), userRepository.getUserPassword(username))) {
