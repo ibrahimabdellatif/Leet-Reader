@@ -10,7 +10,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("api/v1/articles/{articleId}/comments")
+@RequestMapping("api/v1/articles/{id}/comments")
 public class CommentController {
 
     private final CommentService commentService;
@@ -26,9 +26,9 @@ public class CommentController {
         return ResponseEntity.ok().body("Comment posted successfully.😊");
     }
 
-    @DeleteMapping("{id}")
-    public ResponseEntity<String> deleteComment(@PathVariable Long id){
-        commentService.deleteCommentById(id);
+    @DeleteMapping("{commentId}")
+    public ResponseEntity<String> deleteComment(@PathVariable Long commentId){
+        commentService.deleteCommentById(commentId);
         return new ResponseEntity<>("comment deleted successfully",HttpStatus.OK);
     }
 }

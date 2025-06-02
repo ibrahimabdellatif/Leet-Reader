@@ -1,5 +1,6 @@
 package com.leetreader.leetReader.repository;
 
+import com.leetreader.leetReader.dto.article.ArticleResponseDTO;
 import com.leetreader.leetReader.model.Article;
 import org.springframework.data.jpa.repository.JpaRepository;
 
@@ -13,7 +14,8 @@ public interface ArticleRepository extends JpaRepository<Article, Long> {
 
     //    we need to make the article found by title and the author
     Optional<Article> findArticleByTitleAndAuthor_Username(String title, String username);
+
     Optional<Article> findArticleByIdAndAuthor_Id(Long articleId, Long authorId);
 
-    void deleteArticleByTitleAndAuthor_Username(String title,String username);
+    void deleteArticleByTitleAndAuthor_Username(String title, String username);
 }

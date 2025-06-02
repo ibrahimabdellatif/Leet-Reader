@@ -1,8 +1,8 @@
 package com.leetreader.leetReader.controller;
 
 
+import com.leetreader.leetReader.dto.article.ArticleResponseDTO;
 import com.leetreader.leetReader.dto.article.CreateArticleRequest;
-import com.leetreader.leetReader.model.Article;
 import com.leetreader.leetReader.service.ArticleService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -10,7 +10,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/v1/articles")
@@ -22,17 +21,18 @@ public class ArticleController {
     }
 
     @GetMapping
-    public List<Article> getArticles() {
+    public List<ArticleResponseDTO> getArticles() {
         return articleService.getAllArticles();
     }
 
     @GetMapping("/@{username}")
-    public List<Article> getArticlesByUsername(@PathVariable String username) {
+    public List<ArticleResponseDTO> getArticlesByUsername(@PathVariable String username) {
+//        here need to reformating the return of articles.
         return articleService.getArticlesByUsername(username);
     }
 
     @GetMapping("/@{username}/{title}")
-    public Optional<Article> getArticleByTitle(@PathVariable String username, @PathVariable String title) {
+    public ArticleResponseDTO getArticleByTitle(@PathVariable String username, @PathVariable String title) {
         return articleService.getArticleByTitle(title, username);
     }
 
@@ -44,13 +44,12 @@ public class ArticleController {
 
     }
 
-    @PatchMapping("/{articleId}")
-    public ResponseEntity<?> updateArticle(@PathVariable Long articleId, @RequestBody CreateArticleRequest articleRequest) {
-        Article article = articleService.updateArticle(articleId, articleRequest);
-        return ResponseEntity.ok(article);
+    @PatchMapping("/{id}")
+    public ResponseEntity<?> updateArticle(@PathVariable Long id, @RequestBody CreateArticleRequest articleRequest) {
+        return ResponseEntity.ok(articleService.updateArticle(id, articleRequest));
     }
 
-    @DeleteMapping("/{articleId}")
+    @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteArticle(@PathVariable Long articleId) {
         articleService.deleteArticle(articleId);
         return ResponseEntity.ok("Article deleted successfully");

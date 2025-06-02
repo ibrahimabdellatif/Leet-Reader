@@ -2,11 +2,12 @@ package com.leetreader.leetReader.mapper;
 
 import com.leetreader.leetReader.dto.user.UserResponseDTO;
 import com.leetreader.leetReader.model.User;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 import java.util.function.Function;
 
-@Service
+@Component
 public class UserDTOMapper implements Function<User, UserResponseDTO> {
     @Override
     public UserResponseDTO apply(User user) {

@@ -1,10 +1,12 @@
 package com.leetreader.leetReader.service;
 
+import com.leetreader.leetReader.dto.article.ArticleResponseDTO;
 import com.leetreader.leetReader.dto.article.CreateArticleRequest;
 import com.leetreader.leetReader.exception.article.ArticleIsNotExist;
 import com.leetreader.leetReader.exception.article.DuplicateTitleException;
 import com.leetreader.leetReader.exception.article.InvalidEmptyInputException;
 import com.leetreader.leetReader.exception.user.ForbiddenException;
+import com.leetreader.leetReader.mapper.ArticleResponseDTOMapper;
 import com.leetreader.leetReader.model.Article;
 import com.leetreader.leetReader.model.User;
 import com.leetreader.leetReader.repository.ArticleRepository;
@@ -18,37 +20,39 @@ import org.springframework.util.StringUtils;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class ArticleService {
 
     private final UserRepository userRepository;
     private final ArticleRepository articleRepository;
+    private final ArticleResponseDTOMapper articleResponseDTOMapper;
 
-    public ArticleService(ArticleRepository articleRepository, UserRepository userRepository) {
+    public ArticleService(ArticleRepository articleRepository, UserRepository userRepository, ArticleResponseDTOMapper articleResponseDTOMapper) {
         this.articleRepository = articleRepository;
         this.userRepository = userRepository;
+        this.articleResponseDTOMapper = articleResponseDTOMapper;
     }
 
-    public List<Article> getAllArticles() {
-        return articleRepository.findAll();
+    public List<ArticleResponseDTO> getAllArticles() {
+        return articleToArticleResponse(articleRepository.findAll());
     }
 
-    public List<Article> getArticlesByUsername(String username) {
-        return articleRepository.findArticlesByAuthor_Username(username);
+    public List<ArticleResponseDTO> getArticlesByUsername(String username) {
+        List<Article> articles = articleRepository.findArticlesByAuthor_Username(username);
+        return articleToArticleResponse(articles);
     }
 
-    public Optional<Article> getArticleByTitle(String title, String username) {
-        Optional<Article> article = articleRepository.findArticleByTitleAndAuthor_Username(title, username);
+    public ArticleResponseDTO getArticleByTitle(String title, String username) {
+        Article article = articleRepository.findArticleByTitleAndAuthor_Username(title, username)
+                .orElseThrow(() -> new ArticleIsNotExist("article with title: " + title + "and username: " + username + " is not exist"));
 
-        if (article.isPresent()) {
-            System.out.println("The Article is found 😊 the title:" + title + " The username: " + username);
-        } else System.out.println("The Article is not found 😒the title:" + title + " The username: " + username);
-        return article;
+        return articleResponseDTOMapper.apply(article);
     }
 
     @Transactional
-    public Article addArticle(String username, CreateArticleRequest article) throws UsernameNotFoundException, DuplicateTitleException {
+    public ArticleResponseDTO addArticle(String username, CreateArticleRequest article) throws UsernameNotFoundException, DuplicateTitleException {
         User author = userRepository.findUserByUsername(username).orElseThrow(
                 () -> new UsernameNotFoundException("username is not found"));
 
@@ -60,10 +64,10 @@ public class ArticleService {
         newArticle.setTitle(article.title());
         newArticle.setContent(article.content());
         newArticle.setCreatedAt(LocalDateTime.now());
-        return articleRepository.save(newArticle);
+        return articleResponseDTOMapper.apply(articleRepository.save(newArticle));
     }
 
-    public Article updateArticle(Long articleId, CreateArticleRequest article) {
+    public ArticleResponseDTO updateArticle(Long articleId, CreateArticleRequest article) {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         isArticleTitleExistsForUser(article.title(), username);
 
@@ -77,7 +81,7 @@ public class ArticleService {
             throw new InvalidEmptyInputException("you must update at least one field.");
         }
         existedArticle.setUpdatedAt(LocalDateTime.now());
-        return articleRepository.save(existedArticle);
+        return articleResponseDTOMapper.apply(articleRepository.save(existedArticle));
     }
 
     @Transactional
@@ -106,5 +110,20 @@ public class ArticleService {
         if (articleByTitleAndAuthorUsername.isPresent()) {
             throw new DuplicateTitleException("⚠ You've used this title before. Please try another one!");
         }
+    }
+
+    private List<ArticleResponseDTO> articleToArticleResponse(List<Article> articles) {
+        return articles.stream()
+                .map(article -> ArticleResponseDTO.builder()
+                        .id(article.getId())
+                        .authorId(article.getAuthor().getId())
+                        .authorUsername(article.getAuthor().getUsername())
+                        .title(article.getTitle())
+                        .content(article.getContent())
+                        .comments(article.getComments())
+                        .createdAt(article.getCreatedAt())
+                        .updatedAt(article.getUpdatedAt())
+                        .build())
+                .collect(Collectors.toList());
     }
 }
